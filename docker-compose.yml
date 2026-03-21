@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  pulse-news:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pulse-news
+    ports:
+      - "3000:80"        # Access at http://localhost:3000
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
