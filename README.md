@@ -1,124 +1,127 @@
 # PULSE — World News Intelligence
 
-A real-time, AI-powered global news aggregator running as a containerized application.
-Powered by Claude AI with live web search. No backend required — the app calls the Anthropic API directly from the browser.
+Real-time AI-powered global news. Powered by Claude with live web search.
+Zero npm dependencies — just Node.js and your Anthropic API key.
 
 ---
 
-## Prerequisites
-
-- [Docker](https://docs.docker.com/get-docker/) installed
-- An [Anthropic API key](https://console.anthropic.com/) (`sk-ant-…`)
-
----
-
-## Quick Start (Docker Compose)
+## Step 1 — Add your API key
 
 ```bash
-# 1. Clone / unzip this folder
-cd pulse-news
+cp .env.example .env
+```
 
-# 2. Build and start
+Open `.env` and replace the placeholder:
+
+```
+ANTHROPIC_API_KEY=sk-ant-xxxxxxxxxxxxxxxx
+```
+
+Get a key at → https://console.anthropic.com/
+
+---
+
+## Option A — Run locally (Node.js)
+
+Requirements: Node.js 18+
+
+```bash
+# Start the server
+node server.js
+
+# Open in browser
+open http://localhost:3000
+```
+
+That's it. No npm install needed.
+
+---
+
+## Option B — Run with Docker
+
+```bash
+# Build and start
 docker compose up -d
 
-# 3. Open in your browser
+# Open in browser
 open http://localhost:3000
+
+# View logs
+docker compose logs -f
+
+# Stop
+docker compose down
 ```
 
-On first load, the app will ask for your Anthropic API key.
-Enter it once — it's saved in your browser's localStorage and never leaves your machine except to call Anthropic's API directly.
-
----
-
-## Docker (without Compose)
+Or without Compose:
 
 ```bash
-# Build the image
 docker build -t pulse-news .
 
-# Run the container
 docker run -d \
   --name pulse-news \
-  -p 3000:80 \
-  --restart unless-stopped \
+  -p 3000:3000 \
+  -e ANTHROPIC_API_KEY=sk-ant-your-key-here \
   pulse-news
-
-# Open
-open http://localhost:3000
 ```
 
 ---
 
-## Deploy to Production
+## How it works
 
-### Fly.io (recommended — free tier available)
+```
+Browser  →  /api/news  →  server.js  →  api.anthropic.com
+                            (holds API key securely)
+```
+
+- The browser never touches the Anthropic API directly
+- Your API key lives only in `.env` on the server
+- Claude searches the live web and returns real-time news as JSON
+- The frontend renders it into a newspaper-style layout
+
+---
+
+## Deploy to cloud
+
+### Fly.io (free tier)
 ```bash
-# Install flyctl: https://fly.io/docs/hands-on/install-flyctl/
 fly auth login
-fly launch          # auto-detects Dockerfile
+fly launch   # auto-detects Dockerfile, sets port 3000
+fly secrets set ANTHROPIC_API_KEY=sk-ant-your-key
 fly deploy
 ```
 
-### Render.com
-1. Push this folder to a GitHub repo
-2. New → Web Service → connect repo
-3. Runtime: Docker
-4. Port: 80
-5. Deploy
-
 ### Railway
 ```bash
-railway login
-railway init
-railway up
+railway login && railway init && railway up
+# Set ANTHROPIC_API_KEY in Railway dashboard → Variables
 ```
 
-### Any VPS (DigitalOcean, Hetzner, AWS EC2, etc.)
+### Render
+1. Push to GitHub
+2. New Web Service → Docker
+3. Add env var: `ANTHROPIC_API_KEY`
+
+### Any VPS
 ```bash
-# On your server:
-git clone <your-repo>
-cd pulse-news
+git clone <your-repo> && cd pulse-news
+cp .env.example .env  # add your key
 docker compose up -d
-# Then point your domain / reverse proxy to port 3000
 ```
 
 ---
 
-## Features
-
-| Feature | Details |
-|---------|---------|
-| Live news | Claude AI searches the web in real time |
-| 11 categories | Top Stories, World, Politics, Tech, Business, Science, Health, Climate, AI, Sports, Entertainment |
-| Search | Type any topic, event, or country |
-| Story detail | Click any card to expand full report |
-| Breaking ticker | Scrolling headlines |
-| API key storage | LocalStorage — never sent to any server |
-
----
-
-## Project Structure
+## Project structure
 
 ```
 pulse-news/
-├── Dockerfile          ← Container definition
-├── docker-compose.yml  ← Local dev orchestration
-├── nginx.conf          ← Web server config
-├── public/
-│   └── index.html      ← Entire app (single file)
-└── README.md
+├── server.js          ← Node.js proxy server (no deps)
+├── env.js             ← .env file loader (no deps)
+├── package.json
+├── Dockerfile
+├── docker-compose.yml
+├── .env.example       ← copy to .env and add your key
+├── .gitignore
+└── public/
+    └── index.html     ← full frontend app
 ```
-
----
-
-## Environment & Security Notes
-
-- Your API key is stored in `localStorage` in the browser — it's only sent to `api.anthropic.com`.
-- For a team/public deployment, consider adding a lightweight backend proxy to keep the key server-side.
-- The nginx config adds standard security headers.
-
----
-
-## License
-
-MIT — use freely, modify, and deploy anywhere.
