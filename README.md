@@ -1,10 +1,10 @@
-# PULSE — World News (3 Free Options)
+# PULSE — World News 
 
 Pick the option that suits you. All three share the same UI.
 
 ---
 
-## Option 1 — RSS Feeds (`/rss`) ✅ RECOMMENDED
+## RSS Feeds
 **100% free. No API key. No limits. No sign-up.**
 Sources: BBC News, Reuters, The Guardian, NY Times, NPR, TechCrunch, Wired
 
