@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PULSE — World News</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Mono:wght@300;400;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet"/>
+<style>
+/* ── RESET & BASE ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: #f4efe6;
+  color: #111;
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── PAPER TEXTURE ── */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9998;
+}
+
+/* ── CSS VARIABLES ── */
+:root {
+  --ink: #0e0e0e;
+  --paper: #f4efe6;
+  --cream: #ece6d8;
+  --accent: #bf3030;
+  --accent2: #1a3a5c;
+  --muted: #7a7060;
+  --border: #ccc4b4;
+  --card: #faf6ef;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
+}
+
+/* ── HEADER / MASTHEAD ── */
+.masthead {
+  background: var(--paper);
+  border-bottom: 3px double var(--ink);
+  position: sticky;
+  top: 0;
+  z-index: 500;
+  padding: 0 2rem;
+}
+
+.masthead-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .5rem 0;
+  border-bottom: 1px solid var(--border);
+  font-family: 'DM Mono', monospace;
+  font-size: .68rem;
+  color: var(--muted);
+  letter-spacing: .08em;
+}
+
+.live-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.live-dot {
+  width: 6px; height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  animation: pulse-dot 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .3; transform: scale(.8); }
+}
+
+.masthead-brand {
+  text-align: center;
+  padding: .8rem 0 .4rem;
+}
+
+.masthead-brand h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.8rem, 7vw, 5.5rem);
+  font-weight: 900;
+  letter-spacing: -.03em;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.masthead-brand h1 .accent-letter {
+  color: var(--accent);
+  font-style: italic;
+}
+
+.masthead-sub {
+  font-family: 'DM Mono', monospace;
+  font-size: .62rem;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 3px;
+}
+
+/* ── CATEGORY NAV ── */
+.cat-nav {
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-top: 1px solid var(--border);
+  margin-top: .4rem;
+  gap: 0;
+}
+.cat-nav::-webkit-scrollbar { display: none; }
+
+.cat-btn {
+  flex-shrink: 0;
+  padding: .5rem 1.05rem;
+  font-family: 'DM Mono', monospace;
+  font-size: .67rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  background: none;
+  border: none;
+  border-right: 1px solid var(--border);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all .18s;
+  white-space: nowrap;
+  position: relative;
+}
+.cat-btn::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transition: transform .18s;
+}
+.cat-btn:hover { color: var(--ink); background: var(--cream); }
+.cat-btn:hover::after { transform: scaleX(1); }
+.cat-btn.active {
+  background: var(--ink);
+  color: var(--paper);
+}
+.cat-btn.active::after { display: none; }
+
+/* ── BREAKING TICKER ── */
+.ticker-bar {
+  background: var(--ink);
+  color: var(--paper);
+  overflow: hidden;
+  white-space: nowrap;
+  padding: .42rem 0;
+  border-bottom: 2px solid var(--accent);
+}
+
+.ticker-inner {
+  display: flex;
+  align-items: center;
+}
+
+.ticker-label {
+  flex-shrink: 0;
+  background: var(--accent);
+  font-family: 'DM Mono', monospace;
+  font-size: .62rem;
+  font-weight: 500;
+  letter-spacing: .15em;
+  padding: .2rem .9rem;
+  margin-right: .8rem;
+  text-transform: uppercase;
+}
+
+.ticker-track {
+  flex: 1;
+  overflow: hidden;
+}
+
+.ticker-content {
+  display: inline-block;
+  white-space: nowrap;
+  animation: ticker-scroll 90s linear infinite;
+  font-family: 'DM Mono', monospace;
+  font-size: .7rem;
+  letter-spacing: .04em;
+  padding-left: 100%;
+}
+
+@keyframes ticker-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+/* ── MAIN LAYOUT ── */
+main {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 1.6rem 1.5rem 5rem;
+}
+
+/* ── SEARCH ── */
+.search-bar {
+  display: flex;
+  max-width: 580px;
+  margin-bottom: 1.6rem;
+  border: 2px solid var(--ink);
+  background: var(--card);
+  transition: box-shadow .2s;
+}
+.search-bar:focus-within {
+  box-shadow: 4px 4px 0 var(--ink);
+}
+.search-bar input {
+  flex: 1;
+  padding: .65rem 1rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .9rem;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  outline: none;
+}
+.search-bar input::placeholder { color: var(--muted); }
+.search-bar button {
+  padding: .65rem 1.3rem;
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  font-family: 'DM Mono', monospace;
+  font-size: .7rem;
+  letter-spacing: .1em;
+  cursor: pointer;
+  transition: background .18s;
+  white-space: nowrap;
+}
+.search-bar button:hover { background: var(--accent); }
+
+/* ── SECTION HEADER ── */
+.section-hdr {
+  font-family: 'DM Mono', monospace;
+  font-size: .68rem;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-top: 2.5px solid var(--ink);
+  padding-top: .5rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.refresh-btn {
+  font-family: 'DM Mono', monospace;
+  font-size: .62rem;
+  letter-spacing: .08em;
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: .25rem .7rem;
+  cursor: pointer;
+  transition: all .18s;
+}
+.refresh-btn:hover { border-color: var(--ink); color: var(--ink); }
+.refresh-btn.spinning { animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── HERO LAYOUT ── */
+.hero-layout {
+  display: grid;
+  grid-template-columns: 1fr 310px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  margin-bottom: 1.8rem;
+  box-shadow: var(--shadow);
+}
+
+.hero-lead {
+  padding: 1.8rem;
+  border-right: 1px solid var(--border);
+  cursor: pointer;
+  transition: background .18s;
+}
+.hero-lead:hover { background: var(--cream); }
+
+.hero-lead-img {
+  width: 100%;
+  height: 210px;
+  object-fit: cover;
+  display: block;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border);
+}
+
+.hero-aside {
+  display: flex;
+  flex-direction: column;
+}
+
+.aside-item {
+  flex: 1;
+  padding: 1rem 1.1rem;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background .18s;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.aside-item:last-child { border-bottom: none; }
+.aside-item:hover { background: var(--cream); }
+
+/* ── TAGS ── */
+.tag {
+  display: inline-block;
+  font-family: 'DM Mono', monospace;
+  font-size: .58rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #fff;
+  padding: 2px 7px;
+  border-radius: 1px;
+  margin-bottom: .45rem;
+}
+.t-world      { background: #1a3a5c; }
+.t-politics   { background: #2471a3; }
+.t-technology { background: #1e8449; }
+.t-business   { background: #6c3483; }
+.t-science    { background: #0e6655; }
+.t-health     { background: #922b21; }
+.t-climate    { background: #0e7f73; }
+.t-ai         { background: #4a235a; }
+.t-sports     { background: #b7770d; }
+.t-entertainment { background: #a04000; }
+.t-default    { background: #555; }
+
+/* ── TYPOGRAPHY ── */
+.hero-headline {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.4rem, 2.6vw, 2.15rem);
+  font-weight: 700;
+  line-height: 1.22;
+  color: var(--ink);
+  margin-bottom: .55rem;
+}
+
+.hero-meta {
+  font-family: 'DM Mono', monospace;
+  font-size: .64rem;
+  color: var(--muted);
+  letter-spacing: .04em;
+  margin-bottom: .8rem;
+}
+
+.hero-summary {
+  font-size: .93rem;
+  line-height: 1.72;
+  color: #3a342a;
+}
+
+.aside-headline {
+  font-family: 'Playfair Display', serif;
+  font-size: .93rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--ink);
+}
+
+.aside-meta {
+  font-family: 'DM Mono', monospace;
+  font-size: .6rem;
+  color: var(--muted);
+}
+
+/* ── NEWS GRID ── */
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(275px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow);
+}
+
+.news-card {
+  background: var(--card);
+  padding: 1.15rem;
+  cursor: pointer;
+  transition: background .18s;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.news-card:hover { background: var(--cream); }
+
+.card-img {
+  width: 100%;
+  height: 125px;
+  object-fit: cover;
+  display: block;
+  margin-bottom: 6px;
+  border: 1px solid var(--border);
+}
+
+.card-headline {
+  font-family: 'Playfair Display', serif;
+  font-size: .98rem;
+  font-weight: 700;
+  line-height: 1.38;
+  color: var(--ink);
+}
+
+.card-summary {
+  font-size: .82rem;
+  line-height: 1.6;
+  color: #4a4030;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-meta {
+  font-family: 'DM Mono', monospace;
+  font-size: .6rem;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.read-link {
+  font-family: 'DM Mono', monospace;
+  font-size: .6rem;
+  color: var(--accent);
+  text-decoration: none;
+  margin-top: 2px;
+  display: inline-block;
+}
+.read-link:hover { text-decoration: underline; }
+
+/* ── LOADING ── */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 2rem;
+  gap: 1rem;
+}
+.loader {
+  width: 36px; height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--ink);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+.loading-txt {
+  font-family: 'DM Mono', monospace;
+  font-size: .72rem;
+  color: var(--muted);
+  letter-spacing: .12em;
+  animation: fade-pulse 1.2s ease-in-out infinite;
+}
+@keyframes fade-pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+/* ── ERROR ── */
+.error-state {
+  padding: 2.5rem 2rem;
+  text-align: center;
+  border: 1px solid var(--border);
+  background: var(--card);
+}
+.error-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  color: var(--accent);
+  margin-bottom: .5rem;
+}
+.error-msg {
+  font-family: 'DM Mono', monospace;
+  font-size: .72rem;
+  color: var(--muted);
+  line-height: 1.7;
+}
+.retry-btn {
+  margin-top: 1rem;
+  padding: .55rem 1.4rem;
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  font-family: 'DM Mono', monospace;
+  font-size: .72rem;
+  letter-spacing: .1em;
+  cursor: pointer;
+}
+.retry-btn:hover { background: var(--accent); }
+
+/* ── EMPTY ── */
+.empty-state {
+  padding: 3rem;
+  text-align: center;
+  font-family: 'DM Mono', monospace;
+  font-size: .78rem;
+  color: var(--muted);
+  letter-spacing: .1em;
+  border: 1px solid var(--border);
+}
+
+/* ── MODAL ── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(14,14,14,.65);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 1.2rem;
+  backdrop-filter: blur(2px);
+}
+.modal-overlay.open { display: flex; }
+
+.modal-box {
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  max-width: 700px;
+  width: 100%;
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 2rem;
+  position: relative;
+  box-shadow: 8px 8px 0 var(--ink);
+  animation: modal-in .22s ease;
+}
+@keyframes modal-in {
+  from { transform: translateY(12px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.modal-close {
+  position: absolute;
+  top: .9rem; right: 1rem;
+  background: none;
+  border: 1px solid var(--border);
+  width: 30px; height: 30px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: var(--muted);
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+}
+.modal-close:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+.modal-img {
+  width: 100%;
+  max-height: 240px;
+  object-fit: cover;
+  display: block;
+  margin: .8rem 0 1.1rem;
+  border: 1px solid var(--border);
+}
+
+.modal-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.25rem, 2.5vw, 1.85rem);
+  font-weight: 700;
+  line-height: 1.28;
+  margin: .5rem 0;
+  color: var(--ink);
+}
+
+.modal-meta {
+  font-family: 'DM Mono', monospace;
+  font-size: .67rem;
+  color: var(--muted);
+  margin-bottom: 1.1rem;
+  letter-spacing: .04em;
+}
+
+.modal-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin-bottom: 1rem;
+}
+
+.modal-summary {
+  font-size: .95rem;
+  line-height: 1.8;
+  color: #2a241c;
+}
+
+.modal-read-btn {
+  display: inline-block;
+  margin-top: 1.3rem;
+  padding: .6rem 1.4rem;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: 'DM Mono', monospace;
+  font-size: .72rem;
+  letter-spacing: .1em;
+  text-decoration: none;
+  border: 2px solid var(--ink);
+  transition: all .18s;
+}
+.modal-read-btn:hover {
+  background: transparent;
+  color: var(--ink);
+}
+
+/* ── FOOTER ── */
+footer {
+  border-top: 3px double var(--ink);
+  padding: 1.2rem 2rem;
+  text-align: center;
+  font-family: 'DM Mono', monospace;
+  font-size: .62rem;
+  color: var(--muted);
+  letter-spacing: .1em;
+  line-height: 1.8;
+}
+
+footer a { color: var(--accent); text-decoration: none; }
+footer a:hover { text-decoration: underline; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 860px) {
+  .hero-layout { grid-template-columns: 1fr; }
+  .hero-lead { border-right: none; border-bottom: 1px solid var(--border); }
+  .hero-aside { flex-direction: row; overflow-x: auto; }
+  .aside-item { min-width: 210px; border-right: 1px solid var(--border); border-bottom: none; }
+  .aside-item:last-child { border-right: none; }
+}
+
+@media (max-width: 560px) {
+  .masthead { padding: 0 1rem; }
+  main { padding: 1rem 1rem 3rem; }
+  .masthead-top { font-size: .6rem; }
+  .hero-aside { flex-direction: column; }
+  .aside-item { min-width: unset; border-right: none; border-bottom: 1px solid var(--border); }
+}
+</style>
+</head>
+<body>
+
+<!-- ── MODAL ── -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box" id="modalBox">
+    <button class="modal-close" id="modalClose">✕</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<!-- ── MASTHEAD ── -->
+<header class="masthead">
+  <div class="masthead-top">
+    <div class="live-indicator">
+      <div class="live-dot"></div>
+      <span>LIVE</span>
+    </div>
+    <span id="clockDisplay">—</span>
+    <span>RSS · FREE · NO API KEY</span>
+  </div>
+  <div class="masthead-brand">
+    <h1>PUL<span class="accent-letter">S</span>E</h1>
+    <div class="masthead-sub">World News · Powered by RSS Feeds</div>
+  </div>
+  <nav class="cat-nav" id="catNav">
+    <button class="cat-btn active" data-cat="Top Stories">Top Stories</button>
+    <button class="cat-btn" data-cat="World">World</button>
+    <button class="cat-btn" data-cat="Politics">Politics</button>
+    <button class="cat-btn" data-cat="Technology">Technology</button>
+    <button class="cat-btn" data-cat="Business">Business</button>
+    <button class="cat-btn" data-cat="Science">Science</button>
+    <button class="cat-btn" data-cat="Health">Health</button>
+    <button class="cat-btn" data-cat="Climate">Climate</button>
+    <button class="cat-btn" data-cat="AI">AI</button>
+    <button class="cat-btn" data-cat="Sports">Sports</button>
+    <button class="cat-btn" data-cat="Entertainment">Entertainment</button>
+  </nav>
+</header>
+
+<!-- ── TICKER ── -->
+<div class="ticker-bar">
+  <div class="ticker-inner">
+    <span class="ticker-label">Breaking</span>
+    <div class="ticker-track">
+      <span class="ticker-content" id="tickerText">Fetching latest headlines from global sources…</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── MAIN ── -->
+<main>
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Search headlines — type any topic and press Enter…" autocomplete="off"/>
+    <button id="searchBtn">Search</button>
+  </div>
+
+  <div id="heroArea"></div>
+
+  <div class="section-hdr" id="sectionHdr">
+    <span id="sectionLabel">More Stories</span>
+    <button class="refresh-btn" id="refreshBtn" title="Refresh">↻ Refresh</button>
+  </div>
+
+  <div id="gridArea"></div>
+</main>
+
+<!-- ── FOOTER ── -->
+<footer>
+  PULSE · Free RSS news aggregator · Sources: BBC News, Reuters, The Guardian, NY Times, NPR, TechCrunch, Wired &amp; more<br>
+  Static site — deployable on <a href="https://pages.github.com" target="_blank">GitHub Pages</a> · No server · No API key · 100% free
+</footer>
+
+<script>
+"use strict";
+
+// ─────────────────────────────────────────────────────────────
+//  RSS FEED SOURCES  (fetched via allorigins.win CORS proxy)
+// ─────────────────────────────────────────────────────────────
+const FEEDS = {
+  "Top Stories": [
+    "https://feeds.bbci.co.uk/news/rss.xml",
+    "https://feeds.reuters.com/reuters/topNews",
+    "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
+    "https://www.theguardian.com/world/rss",
+    "https://feeds.npr.org/1001/rss.xml",
+  ],
+  "World": [
+    "https://feeds.bbci.co.uk/news/world/rss.xml",
+    "https://feeds.reuters.com/Reuters/worldNews",
+    "https://www.theguardian.com/world/rss",
+    "https://rss.nytimes.com/services/xml/rss/nyt/World.xml",
+  ],
+  "Politics": [
+    "https://feeds.bbci.co.uk/news/politics/rss.xml",
+    "https://rss.nytimes.com/services/xml/rss/nyt/Politics.xml",
+    "https://www.theguardian.com/politics/rss",
+  ],
+  "Technology": [
+    "https://feeds.bbci.co.uk/news/technology/rss.xml",
+    "https://feeds.wired.com/wired/index",
+    "https://techcrunch.com/feed/",
+    "https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml",
+  ],
+  "Business": [
+    "https://feeds.bbci.co.uk/news/business/rss.xml",
+    "https://feeds.reuters.com/reuters/businessNews",
+    "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml",
+    "https://www.theguardian.com/business/rss",
+  ],
+  "Science": [
+    "https://feeds.bbci.co.uk/news/science_and_environment/rss.xml",
+    "https://rss.nytimes.com/services/xml/rss/nyt/Science.xml",
+    "https://www.theguardian.com/science/rss",
+  ],
+  "Health": [
+    "https://feeds.bbci.co.uk/news/health/rss.xml",
+    "https://rss.nytimes.com/services/xml/rss/nyt/Health.xml",
+  ],
+  "Climate": [
+    "https://www.theguardian.com/environment/climate-crisis/rss",
+    "https://rss.nytimes.com/services/xml/rss/nyt/Climate.xml",
+    "https://feeds.bbci.co.uk/news/science_and_environment/rss.xml",
+  ],
+  "AI": [
+    "https://techcrunch.com/tag/artificial-intelligence/feed/",
+    "https://feeds.wired.com/wired/index",
+    "https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml",
+  ],
+  "Sports": [
+    "https://feeds.bbci.co.uk/sport/rss.xml",
+    "https://www.theguardian.com/sport/rss",
+    "https://rss.nytimes.com/services/xml/rss/nyt/Sports.xml",
+  ],
+  "Entertainment": [
+    "https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml",
+    "https://www.theguardian.com/culture/rss",
+    "https://rss.nytimes.com/services/xml/rss/nyt/Arts.xml",
+  ],
+};
+
+// ── 3 CORS proxies with automatic fallback ──
+// If proxy 1 fails, proxy 2 is tried, then proxy 3
+const CORS_PROXIES = [
+  {
+    build:   url => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
+    extract: async res => { const j = await res.json(); return j.contents || ""; },
+  },
+  {
+    build:   url => `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
+    extract: async res => res.text(),
+  },
+  {
+    build:   url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+    extract: async res => res.text(),
+  },
+];
+
+// ─────────────────────────────────────────────────────────────
+//  UTILITIES
+// ─────────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s || "")
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+function tagClass(cat) {
+  const m = {
+    "World":"world","Politics":"politics","Technology":"technology",
+    "Business":"business","Science":"science","Health":"health",
+    "Climate":"climate","AI":"ai","Sports":"sports","Entertainment":"entertainment",
+  };
+  return "tag t-" + (m[cat] || "default");
+}
+
+function timeAgo(str) {
+  if (!str) return "Recently";
+  try {
+    const diff = Date.now() - new Date(str).getTime();
+    const m = Math.floor(diff / 60000);
+    if (m < 2)  return "Just now";
+    if (m < 60) return `${m}m ago`;
+    const h = Math.floor(m / 60);
+    if (h < 24) return `${h}h ago`;
+    const d = Math.floor(h / 24);
+    if (d < 7)  return `${d}d ago`;
+    return new Date(str).toLocaleDateString("en-US", { month:"short", day:"numeric" });
+  } catch { return "Recently"; }
+}
+
+function srcLabel(url) {
+  try {
+    const h = new URL(url).hostname.replace(/^(www\.|feeds\.)/, "");
+    return ({
+      "bbci.co.uk":       "BBC News",
+      "reuters.com":      "Reuters",
+      "nytimes.com":      "NY Times",
+      "theguardian.com":  "The Guardian",
+      "npr.org":          "NPR",
+      "wired.com":        "Wired",
+      "techcrunch.com":   "TechCrunch",
+    })[h] || h;
+  } catch { return "News"; }
+}
+
+function decodeEntities(s) {
+  return String(s || "")
+    .replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">")
+    .replace(/&quot;/g,'"').replace(/&#039;/g,"'").replace(/&apos;/g,"'")
+    .replace(/&#(\d+);/g, (_,n) => String.fromCharCode(+n))
+    .replace(/&ndash;/g,"–").replace(/&mdash;/g,"—").replace(/&hellip;/g,"…")
+    .replace(/&rsquo;/g,"'").replace(/&lsquo;/g,"'")
+    .replace(/&rdquo;/g,'"').replace(/&ldquo;/g,'"');
+}
+
+function stripTags(s) {
+  return String(s || "").replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim();
+}
+
+// ─────────────────────────────────────────────────────────────
+//  RSS PARSER
+// ─────────────────────────────────────────────────────────────
+function extractTag(xml, tag) {
+  const re = new RegExp(
+    `<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>` +
+    `|<${tag}[^>]*>([^<]*)<\\/${tag}>`, "i"
+  );
+  const m = xml.match(re);
+  return m ? (m[1] || m[2] || "").trim() : "";
+}
+
+function guessCategory(text, feedUrl) {
+  const t = (text + feedUrl).toLowerCase();
+  if (/\bai\b|artificial.intelli|openai|chatgpt|deepmind|llm/.test(t))         return "AI";
+  if (/tech|software|apple|google|microsoft|startup|cyber|silicon/.test(t))    return "Technology";
+  if (/climat|environment|emission|carbon|global.warm|renewable/.test(t))      return "Climate";
+  if (/health|medicine|cancer|virus|vaccine|hospital|disease/.test(t))         return "Health";
+  if (/science|space|nasa|planet|research|discovery|biology|physics/.test(t))  return "Science";
+  if (/sport|football|soccer|basketball|tennis|cricket|olympic|nba/.test(t))   return "Sports";
+  if (/entertain|movie|music|film|celebrity|oscar|album|concert/.test(t))      return "Entertainment";
+  if (/market|stock|economy|trade|gdp|inflation|bank|invest|finance/.test(t))  return "Business";
+  if (/election|parliament|congress|president|politic|vote|government/.test(t)) return "Politics";
+  return "World";
+}
+
+function guessRegion(text) {
+  const r = [
+    ["United States", /\bUS\b|\bUSA\b|united states|washington|congress|white house/i],
+    ["United Kingdom", /\bUK\b|britain|london|parliament|downing street/i],
+    ["Europe",         /europe|\bEU\b|brussels|paris|berlin|rome|madrid/i],
+    ["Middle East",    /middle east|israel|palestin|gaza|iran|iraq|saudi/i],
+    ["Asia",           /\bchina\b|beijing|india|japan|korea|pakistan/i],
+    ["Africa",         /africa|nigeria|kenya|ethiopia|egypt|ghana/i],
+    ["Russia",         /russia|moscow|kremlin|ukraine|putin/i],
+    ["Latin America",  /brazil|mexico|argentina|colombia|venezuela/i],
+    ["Australia",      /australia|sydney|melbourne|canberra/i],
+  ];
+  for (const [name, re] of r) if (re.test(text)) return name;
+  return "Global";
+}
+
+function parseRSS(xmlStr, feedUrl) {
+  const items = [];
+  const re = /<item[\s>]([\s\S]*?)<\/item>/gi;
+  let m;
+  while ((m = re.exec(xmlStr)) !== null) {
+    const item  = m[1];
+    const title = decodeEntities(stripTags(extractTag(item, "title")));
+    if (!title || title.length < 5) continue;
+
+    const link  = extractTag(item, "link") || "";
+    const desc  = decodeEntities(stripTags(
+      extractTag(item, "description") || extractTag(item, "summary") || ""
+    ));
+    const pub   = extractTag(item, "pubDate") || extractTag(item, "published") || "";
+
+    // extract image from media:content, enclosure, or img src in description
+    const imgM = item.match(/<media:content[^>]+url="([^"]+\.(jpg|jpeg|png|webp))"/i)
+              || item.match(/url="([^"]+\.(jpg|jpeg|png|webp))"/i)
+              || item.match(/<enclosure[^>]+url="([^"]+\.(jpg|jpeg|png|webp))"/i)
+              || item.match(/src="([^"]+\.(jpg|jpeg|png|webp))"/i)
+              || xmlStr.match(/<media:thumbnail[^>]+url="([^"]+)"/i);
+    const image = imgM ? imgM[1] : "";
+
+    const combined = title + " " + desc;
+    items.push({
+      title,
+      summary:  desc.slice(0, 320) + (desc.length > 320 ? "…" : ""),
+      link:     link.trim(),
+      image,
+      source:   srcLabel(feedUrl),
+      pubDate:  timeAgo(pub),
+      category: guessCategory(combined, feedUrl),
+      region:   guessRegion(combined),
+    });
+  }
+  return items;
+}
+
+// ─────────────────────────────────────────────────────────────
+//  FETCH VIA CORS PROXY
+// ─────────────────────────────────────────────────────────────
+async function fetchFeed(url) {
+  let lastErr;
+  for (const proxy of CORS_PROXIES) {
+    try {
+      const proxyUrl = proxy.build(url);
+      const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(9000) });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const text = await proxy.extract(res);
+      if (text && text.length > 100) return text;   // valid content received
+      throw new Error("Empty response");
+    } catch (e) {
+      lastErr = e;
+      console.warn(`Proxy failed for ${url}:`, e.message, "— trying next proxy…");
+    }
+  }
+  throw lastErr || new Error("All proxies failed");
+}
+
+async function loadFeeds(category) {
+  const urls = FEEDS[category] || FEEDS["Top Stories"];
+  // Fetch all in parallel, ignore individual failures
+  const results = await Promise.allSettled(urls.map(u => fetchFeed(u)));
+  let all = [];
+  results.forEach((r, i) => {
+    if (r.status === "fulfilled") {
+      try { all = all.concat(parseRSS(r.value, urls[i])); } catch {}
+    }
+  });
+  // Deduplicate by title prefix
+  const seen = new Set();
+  const unique = all.filter(a => {
+    const k = a.title.slice(0, 45).toLowerCase();
+    if (seen.has(k)) return false;
+    seen.add(k); return true;
+  });
+  // Shuffle slightly for variety, cap at 12
+  return unique.sort(() => Math.random() - 0.38).slice(0, 12);
+}
+
+async function searchFeeds(query) {
+  // Pull from a spread of feeds for search
+  const allUrls = [...new Set(Object.values(FEEDS).flat())];
+  const sample  = allUrls.sort(() => Math.random() - 0.5).slice(0, 10);
+  const results = await Promise.allSettled(sample.map(u => fetchFeed(u)));
+  let all = [];
+  results.forEach((r, i) => {
+    if (r.status === "fulfilled") {
+      try { all = all.concat(parseRSS(r.value, sample[i])); } catch {}
+    }
+  });
+  const q = query.toLowerCase();
+  const seen = new Set();
+  return all
+    .filter(a => a.title.toLowerCase().includes(q) || a.summary.toLowerCase().includes(q))
+    .filter(a => {
+      const k = a.title.slice(0, 45).toLowerCase();
+      if (seen.has(k)) return false;
+      seen.add(k); return true;
+    })
+    .slice(0, 12);
+}
+
+// ─────────────────────────────────────────────────────────────
+//  RENDER
+// ─────────────────────────────────────────────────────────────
+let _currentArticles = [];
+
+function renderHero(articles) {
+  const heroArea = document.getElementById("heroArea");
+  const gridArea = document.getElementById("gridArea");
+
+  if (!articles.length) {
+    heroArea.innerHTML = `<div class="empty-state">No stories found. Try a different category or search term.</div>`;
+    gridArea.innerHTML = "";
+    return;
+  }
+
+  const [lead, ...rest] = articles;
+
+  heroArea.innerHTML = `
+    <div class="hero-layout">
+      <div class="hero-lead" id="heroLead">
+        ${lead.image ? `<img class="hero-lead-img" src="${esc(lead.image)}" alt="" onerror="this.style.display='none'"/>` : ""}
+        <span class="${tagClass(lead.category)}">${esc(lead.category)}</span>
+        <div class="hero-headline">${esc(lead.title)}</div>
+        <div class="hero-meta">${esc(lead.source)} &nbsp;·&nbsp; ${esc(lead.region)} &nbsp;·&nbsp; ${esc(lead.pubDate)}</div>
+        ${lead.summary ? `<div class="hero-summary">${esc(lead.summary)}</div>` : ""}
+      </div>
+      <div class="hero-aside">
+        ${rest.slice(0, 3).map((a, i) => `
+          <div class="aside-item" data-aside="${i}">
+            <span class="${tagClass(a.category)}">${esc(a.category)}</span>
+            <div class="aside-headline">${esc(a.title)}</div>
+            <div class="aside-meta">${esc(a.source)} · ${esc(a.pubDate)}</div>
+          </div>
+        `).join("")}
+      </div>
+    </div>`;
+
+  document.getElementById("heroLead").onclick = () => openModal(lead);
+  rest.slice(0, 3).forEach((a, i) => {
+    document.querySelector(`[data-aside="${i}"]`).onclick = () => openModal(a);
+  });
+
+  const gridItems = rest.slice(3);
+  if (gridItems.length) {
+    gridArea.innerHTML = `
+      <div class="news-grid">
+        ${gridItems.map((a, i) => `
+          <div class="news-card" data-card="${i}">
+            ${a.image ? `<img class="card-img" src="${esc(a.image)}" alt="" onerror="this.style.display='none'"/>` : ""}
+            <span class="${tagClass(a.category)}">${esc(a.category)}</span>
+            <div class="card-headline">${esc(a.title)}</div>
+            ${a.summary ? `<div class="card-summary">${esc(a.summary)}</div>` : ""}
+            <div class="card-meta">${esc(a.source)} &nbsp;·&nbsp; ${esc(a.region)} &nbsp;·&nbsp; ${esc(a.pubDate)}</div>
+            ${a.link ? `<a class="read-link" href="${esc(a.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">↗ Read original</a>` : ""}
+          </div>
+        `).join("")}
+      </div>`;
+    gridItems.forEach((a, i) => {
+      document.querySelector(`[data-card="${i}"]`).onclick = () => openModal(a);
+    });
+  } else {
+    gridArea.innerHTML = "";
+  }
+
+  // Update ticker
+  document.getElementById("tickerText").textContent =
+    (articles.map(a => a.title + "  ◆  ").join("")).repeat(4);
+}
+
+function showLoading() {
+  document.getElementById("heroArea").innerHTML = `
+    <div class="loading-state">
+      <div class="loader"></div>
+      <div class="loading-txt">Fetching live news…</div>
+    </div>`;
+  document.getElementById("gridArea").innerHTML = "";
+}
+
+function showError(msg, onRetry) {
+  document.getElementById("heroArea").innerHTML = `
+    <div class="error-state">
+      <div class="error-title">Could not load news</div>
+      <div class="error-msg">${esc(msg)}<br>This is usually a temporary network issue. Please try again.</div>
+      <button class="retry-btn" id="retryBtn">↻ Try Again</button>
+    </div>`;
+  document.getElementById("retryBtn").onclick = onRetry;
+}
+
+// ─────────────────────────────────────────────────────────────
+//  MODAL
+// ─────────────────────────────────────────────────────────────
+function openModal(article) {
+  document.getElementById("modalContent").innerHTML = `
+    <span class="${tagClass(article.category)}">${esc(article.category)}</span>
+    ${article.image ? `<img class="modal-img" src="${esc(article.image)}" alt="" onerror="this.style.display='none'"/>` : ""}
+    <div class="modal-title">${esc(article.title)}</div>
+    <div class="modal-meta">${esc(article.source)} &nbsp;·&nbsp; ${esc(article.region)} &nbsp;·&nbsp; ${esc(article.pubDate)}</div>
+    <hr class="modal-divider"/>
+    <div class="modal-summary">${esc(article.summary) || "Click below to read the full story on the original source."}</div>
+    ${article.link
+      ? `<a class="modal-read-btn" href="${esc(article.link)}" target="_blank" rel="noopener">Read Full Story ↗</a>`
+      : ""}
+  `;
+  document.getElementById("modalOverlay").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function closeModal() {
+  document.getElementById("modalOverlay").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+document.getElementById("modalClose").onclick = closeModal;
+document.getElementById("modalOverlay").onclick = e => {
+  if (e.target.id === "modalOverlay") closeModal();
+};
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+
+// ─────────────────────────────────────────────────────────────
+//  MAIN CONTROLLER
+// ─────────────────────────────────────────────────────────────
+let _activeCat = "Top Stories";
+
+async function loadCategory(cat) {
+  _activeCat = cat;
+  document.getElementById("sectionLabel").textContent = cat.toUpperCase() + " STORIES";
+  showLoading();
+  try {
+    const articles = await loadFeeds(cat);
+    _currentArticles = articles;
+    renderHero(articles);
+  } catch(e) {
+    showError(e.message, () => loadCategory(cat));
+  }
+}
+
+async function doSearch(query) {
+  if (!query.trim()) return;
+  document.getElementById("sectionLabel").textContent = `RESULTS FOR "${query.toUpperCase()}"`;
+  document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
+  showLoading();
+  try {
+    const articles = await searchFeeds(query);
+    _currentArticles = articles;
+    renderHero(articles);
+  } catch(e) {
+    showError(e.message, () => doSearch(query));
+  }
+}
+
+// Category clicks
+document.getElementById("catNav").addEventListener("click", e => {
+  const btn = e.target.closest(".cat-btn");
+  if (!btn) return;
+  document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  loadCategory(btn.dataset.cat);
+});
+
+// Search
+document.getElementById("searchBtn").onclick = () => {
+  const q = document.getElementById("searchInput").value.trim();
+  if (q) doSearch(q);
+};
+document.getElementById("searchInput").addEventListener("keydown", e => {
+  if (e.key === "Enter") document.getElementById("searchBtn").click();
+});
+
+// Refresh
+document.getElementById("refreshBtn").onclick = () => {
+  const btn = document.getElementById("refreshBtn");
+  btn.classList.add("spinning");
+  loadCategory(_activeCat).finally(() => btn.classList.remove("spinning"));
+};
+
+// Clock
+function updateClock() {
+  const n = new Date();
+  document.getElementById("clockDisplay").textContent =
+    n.toLocaleDateString("en-US", { weekday:"short", month:"short", day:"numeric" }) +
+    " · " + n.toLocaleTimeString("en-US", { hour:"2-digit", minute:"2-digit" });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// Boot
+loadCategory("Top Stories");
+</script>
+</body>
+</html>

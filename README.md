@@ -1,75 +1,137 @@
-# PULSE — World News (3 Free Options)
+# 🌍 PULSE — World News
 
-Pick the option that suits you. All three share the same UI.
-
----
-
-## Option 1 — RSS Feeds (`/rss`) ✅ RECOMMENDED
-**100% free. No API key. No limits. No sign-up.**
-Sources: BBC News, Reuters, The Guardian, NY Times, NPR, TechCrunch, Wired
-
-```bash
-cd rss
-node server.js
-# open http://localhost:3000
-```
-
-Docker:
-```bash
-cd rss && docker compose up -d
-```
+A real-time, free, static news aggregator powered by RSS feeds from the world's top publishers.  
+**No API key. No server. No cost. Deploys instantly on GitHub Pages.**
 
 ---
 
-## Option 2 — NewsAPI.org (`/newsapi`)
-**Free tier: 100 requests/day. Requires free API key.**
-Get key: https://newsapi.org/register
+## 🔴 Live Demo
+
+> After deploying: `https://YOUR-USERNAME.github.io/pulse-news`
+
+---
+
+## ✨ Features
+
+- 📰 **Real news** from BBC, Reuters, The Guardian, NY Times, NPR, TechCrunch, Wired & more
+- 🗂 **11 categories** — Top Stories, World, Politics, Technology, Business, Science, Health, Climate, AI, Sports, Entertainment
+- 🔍 **Search** any topic across all feeds
+- 🖱 **Click any story** to open a full detail modal
+- 📺 **Breaking news ticker** — scrolls latest headlines
+- ♻️ **Refresh button** — re-fetches latest news on demand
+- 📱 **Fully responsive** — works on mobile, tablet, desktop
+- 🆓 **100% free** — uses `allorigins.win` as a CORS proxy to fetch RSS feeds
+
+---
+
+## 🚀 Deploy to GitHub Pages
+
+### Option A — GitHub UI (easiest, no Git needed)
+
+1. Go to [github.com/new](https://github.com/new) → create a public repo named `pulse-news`
+2. Click **"uploading an existing file"** → upload `index.html`
+3. Go to **Settings → Pages → Branch: main → Save**
+4. Visit `https://YOUR-USERNAME.github.io/pulse-news` ✅
+
+---
+
+### Option B — Git CLI
 
 ```bash
-cd newsapi
-cp .env.example .env
-# Edit .env → NEWSAPI_KEY=your_key_here
-node server.js
+# Clone your new empty repo
+git clone https://github.com/YOUR-USERNAME/pulse-news.git
+cd pulse-news
+
+# Copy files in
+cp /path/to/downloaded/pulse-github/* .
+
+# Push
+git add .
+git commit -m "🚀 Initial deploy — PULSE news"
+git push origin main
 ```
 
-Docker:
+Then enable Pages: **Settings → Pages → Branch: main → Save**
+
+---
+
+### Option C — From scratch with this repo
+
 ```bash
-cd newsapi && docker compose up -d
+git clone https://github.com/YOUR-USERNAME/pulse-news.git
+cd pulse-news
+git add .
+git commit -m "first commit"
+git push
 ```
 
 ---
 
-## Option 3 — GNews API (`/gnews`)
-**Free tier: 100 requests/day, 10 articles/request. Requires free API key.**
-Get key: https://gnews.io/
+## 📁 Project Structure
 
-```bash
-cd gnews
-cp .env.example .env
-# Edit .env → GNEWS_KEY=your_key_here
-node server.js
 ```
-
-Docker:
-```bash
-cd gnews && docker compose up -d
+pulse-news/
+├── index.html        ← Entire app (single file)
+├── README.md         ← This file
+├── .gitignore        ← Standard ignores
+└── .github/
+    └── workflows/
+        └── deploy.yml  ← Auto-deploy via GitHub Actions (optional)
 ```
 
 ---
 
-## Comparison
+## 🔧 How It Works
 
-| Feature            | RSS (Option 1)    | NewsAPI (Option 2) | GNews (Option 3)  |
-|--------------------|-------------------|-------------------|-------------------|
-| Cost               | FREE forever      | Free (100/day)    | Free (100/day)    |
-| API Key needed     | No                | Yes (free)        | Yes (free)        |
-| Articles per call  | 12+               | 12                | 10                |
-| Images             | Sometimes         | Yes               | Yes               |
-| Search             | Yes (client-side) | Yes               | Yes               |
-| Sources            | BBC,Reuters,etc.  | 70,000+ sources   | Global sources    |
+```
+Browser
+  └─► allorigins.win (free CORS proxy)
+         └─► BBC News RSS
+         └─► Reuters RSS
+         └─► The Guardian RSS
+         └─► NY Times RSS
+         └─► NPR RSS
+         └─► TechCrunch RSS
+         └─► Wired RSS
+         └─► + more...
+```
+
+Because RSS feeds don't allow direct browser fetching (CORS), `allorigins.win` acts as a free relay. No rate limits for normal use.
 
 ---
 
-## Requirements
-- Node.js 18+ OR Docker
-- No npm install needed — zero dependencies
+## 📡 News Sources
+
+| Source | Categories |
+|--------|-----------|
+| BBC News | All |
+| Reuters | Top, World, Business, Politics, Sports |
+| The Guardian | World, Politics, Business, Science, Climate, Sports, Entertainment |
+| NY Times | All |
+| NPR | Top Stories |
+| TechCrunch | Technology, AI |
+| Wired | Technology, AI |
+
+---
+
+## 🛠 Customization
+
+Open `index.html` and edit the `FEEDS` object at the top of the `<script>` section to add/remove sources:
+
+```js
+const FEEDS = {
+  "Technology": [
+    "https://techcrunch.com/feed/",
+    "https://feeds.wired.com/wired/index",
+    // Add your own RSS feed URL here ↓
+    "https://example.com/rss.xml",
+  ],
+  // ...
+};
+```
+
+---
+
+## 📄 License
+
+MIT — free to use, modify, and deploy anywhere.

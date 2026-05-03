@@ -1,7 +1,0 @@
-version: "3.9"
-services:
-  pulse-rss:
-    build: .
-    container_name: pulse-rss
-    ports: ["3000:3000"]
-    restart: unless-stopped
