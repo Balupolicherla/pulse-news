@@ -1,127 +1,75 @@
-# PULSE — World News Intelligence
+# PULSE — World News (3 Free Options)
 
-Real-time AI-powered global news. Powered by Claude with live web search.
-Zero npm dependencies — just Node.js and your Anthropic API key.
-
----
-
-## Step 1 — Add your API key
-
-```bash
-cp .env.example .env
-```
-
-Open `.env` and replace the placeholder:
-
-```
-ANTHROPIC_API_KEY=sk-ant-xxxxxxxxxxxxxxxx
-```
-
-Get a key at → https://console.anthropic.com/
+Pick the option that suits you. All three share the same UI.
 
 ---
 
-## Option A — Run locally (Node.js)
-
-Requirements: Node.js 18+
+## Option 1 — RSS Feeds (`/rss`) ✅ RECOMMENDED
+**100% free. No API key. No limits. No sign-up.**
+Sources: BBC News, Reuters, The Guardian, NY Times, NPR, TechCrunch, Wired
 
 ```bash
-# Start the server
+cd rss
 node server.js
-
-# Open in browser
-open http://localhost:3000
+# open http://localhost:3000
 ```
 
-That's it. No npm install needed.
-
----
-
-## Option B — Run with Docker
-
+Docker:
 ```bash
-# Build and start
-docker compose up -d
-
-# Open in browser
-open http://localhost:3000
-
-# View logs
-docker compose logs -f
-
-# Stop
-docker compose down
-```
-
-Or without Compose:
-
-```bash
-docker build -t pulse-news .
-
-docker run -d \
-  --name pulse-news \
-  -p 3000:3000 \
-  -e ANTHROPIC_API_KEY=sk-ant-your-key-here \
-  pulse-news
+cd rss && docker compose up -d
 ```
 
 ---
 
-## How it works
+## Option 2 — NewsAPI.org (`/newsapi`)
+**Free tier: 100 requests/day. Requires free API key.**
+Get key: https://newsapi.org/register
 
-```
-Browser  →  /api/news  →  server.js  →  api.anthropic.com
-                            (holds API key securely)
-```
-
-- The browser never touches the Anthropic API directly
-- Your API key lives only in `.env` on the server
-- Claude searches the live web and returns real-time news as JSON
-- The frontend renders it into a newspaper-style layout
-
----
-
-## Deploy to cloud
-
-### Fly.io (free tier)
 ```bash
-fly auth login
-fly launch   # auto-detects Dockerfile, sets port 3000
-fly secrets set ANTHROPIC_API_KEY=sk-ant-your-key
-fly deploy
+cd newsapi
+cp .env.example .env
+# Edit .env → NEWSAPI_KEY=your_key_here
+node server.js
 ```
 
-### Railway
+Docker:
 ```bash
-railway login && railway init && railway up
-# Set ANTHROPIC_API_KEY in Railway dashboard → Variables
-```
-
-### Render
-1. Push to GitHub
-2. New Web Service → Docker
-3. Add env var: `ANTHROPIC_API_KEY`
-
-### Any VPS
-```bash
-git clone <your-repo> && cd pulse-news
-cp .env.example .env  # add your key
-docker compose up -d
+cd newsapi && docker compose up -d
 ```
 
 ---
 
-## Project structure
+## Option 3 — GNews API (`/gnews`)
+**Free tier: 100 requests/day, 10 articles/request. Requires free API key.**
+Get key: https://gnews.io/
 
+```bash
+cd gnews
+cp .env.example .env
+# Edit .env → GNEWS_KEY=your_key_here
+node server.js
 ```
-pulse-news/
-├── server.js          ← Node.js proxy server (no deps)
-├── env.js             ← .env file loader (no deps)
-├── package.json
-├── Dockerfile
-├── docker-compose.yml
-├── .env.example       ← copy to .env and add your key
-├── .gitignore
-└── public/
-    └── index.html     ← full frontend app
+
+Docker:
+```bash
+cd gnews && docker compose up -d
 ```
+
+---
+
+## Comparison
+
+| Feature            | RSS (Option 1)    | NewsAPI (Option 2) | GNews (Option 3)  |
+|--------------------|-------------------|-------------------|-------------------|
+| Cost               | FREE forever      | Free (100/day)    | Free (100/day)    |
+| API Key needed     | No                | Yes (free)        | Yes (free)        |
+| Articles per call  | 12+               | 12                | 10                |
+| Images             | Sometimes         | Yes               | Yes               |
+| Search             | Yes (client-side) | Yes               | Yes               |
+| Sources            | BBC,Reuters,etc.  | 70,000+ sources   | Global sources    |
+
+---
+
+## Requirements
+- Node.js 18+ OR Docker
+- No npm install needed — zero dependencies
